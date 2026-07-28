@@ -18,7 +18,7 @@ getgenv().Miked = {
 
         -- ── optional urls ──
         loaderUrl       = "https://raw.githubusercontent.com/mikeexploits/Miked/refs/heads/main/Loader.lua",
-        emoteCatalogUrl = nil,                         -- your hosted emote-id list (for !emote / !sync)
+        emoteCatalogUrl = "https://raw.githubusercontent.com/mikeexploits/Miked/refs/heads/main/Systems/Emotes.lua",                         -- your hosted emote-id list (for !emote / !sync)
 
         -- ── games (situational modules) ──
         games = { micup = { --[[ [PLACEID] = true ]] } },

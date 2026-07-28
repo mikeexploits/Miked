@@ -5,12 +5,6 @@
     out to every other connected client. All accounts run on one machine,
     so they all dial ws://127.0.0.1:PORT. Nothing Roblox can delete.
 
-    On top of the raw socket this layers a real protocol:
-      · JSON envelopes:  { id, t, to, from, fromId, ack, d }
-      · dedupe · self-echo filtering · targeted delivery · optional acks
-      · auto-reconnect with backoff · outbound buffer flushed on connect
-      · re-exec safe, all state under getgenv().Miked
-
     Public API
       Miked.Socket.send(type, data, opts)   opts = {to=, ack=, onAck=, timeout=}
       Miked.Socket.on(type, fn)  -> fn(data, sender, env) ; returns unsub
@@ -24,7 +18,22 @@
 
 local Players     = game:GetService("Players")
 local HttpService = game:GetService("HttpService")
-local LP          = Players.LocalPlayer
+
+-- Autoexec (and queue_on_teleport) run before the game finishes loading, so
+-- LocalPlayer doesn't exist yet. Wait for both before touching anything.
+if not game:IsLoaded() then game.Loaded:Wait() end
+if not Players.LocalPlayer then
+    repeat task.wait() until Players.LocalPlayer
+end
+
+-- Never trust a captured LocalPlayer. On rejoin / teleport the old one is
+-- destroyed while this module's coroutines are still alive, so every read
+-- goes through me() and every caller handles nil instead of throwing.
+local LP = Players.LocalPlayer
+local function me()
+    if not LP or not LP.Parent then LP = Players.LocalPlayer end
+    return LP
+end
 
 
 -- Namespace root — core.lua (or loader.lua) normally sets this up first.
@@ -69,7 +78,8 @@ local GEN      = Socket._gen
 -- Helpers -----------------------------------------------------------------
 local function makeId()
     Socket._msgn += 1
-    return string.format("%d:%d:%d", LP.UserId, math.floor(tick() * 1000), Socket._msgn)
+    local p = me()
+    return string.format("%d:%d:%d", p and p.UserId or 0, math.floor(tick() * 1000), Socket._msgn)
 end
 
 local function seen(id)
@@ -84,7 +94,8 @@ end
 
 local function amTarget(to)
     if to == nil or to == "all" then return true end
-    if to == LP.Name or to == LP.Name:lower() or to == LP.UserId then return true end
+    local p = me(); if not p then return false end
+    if to == p.Name or to == p.Name:lower() or to == p.UserId then return true end
     return false
 end
 
@@ -105,12 +116,14 @@ end
 
 function Socket.send(msgType, data, opts)
     opts = opts or {}
+    local p = me()
+    if not p then return nil end          -- mid-rejoin: nothing to send as
     local env = {
         id     = makeId(),
         t      = msgType,
         to     = opts.to or "all",
-        from   = LP.Name,
-        fromId = LP.UserId,
+        from   = p.Name,
+        fromId = p.UserId,
         ack    = opts.ack and true or nil,
         d      = data,
     }
@@ -144,7 +157,9 @@ end
 -- Dispatch (the receive brain) --------------------------------------------
 local function dispatch(env)
     if type(env) ~= "table" or not env.id or not env.t then return end
-    if env.from == LP.Name and not Socket.receiveOwn then return end
+    local p = me()
+    if not p then return end              -- no identity yet: drop, relay will resend
+    if env.from == p.Name and not Socket.receiveOwn then return end
     if seen(env.id) then return end
 
     -- ack replies resolve a pending send, ignoring targeting
@@ -259,7 +274,8 @@ end
 
 -- Built-in self-test ------------------------------------------------------
 Socket.on("sys.ping", function(_, sender)
-    Socket.send("sys.pong", { name = LP.Name }, { to = sender.name })
+    local p = me(); if not p then return end
+    Socket.send("sys.pong", { name = p.Name }, { to = sender.name })
 end)
 
 Socket.on("sys.pong", function(_, sender)

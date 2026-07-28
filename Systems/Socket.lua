@@ -1,8 +1,6 @@
 --[[
-    Miked.Socket — client-to-client transport
+    Miked.Socket — client-to-client transport (foundation brick #1)
     ----------------------------------------------------------------
-    Dependancy: pip install websockets
-
     Transport: WebSocket to a local relay (relay.py) that fans messages
     out to every other connected client. All accounts run on one machine,
     so they all dial ws://127.0.0.1:PORT. Nothing Roblox can delete.
@@ -29,18 +27,16 @@ local HttpService = game:GetService("HttpService")
 local LP          = Players.LocalPlayer
 
 
--- Namespace root (Socket is the first brick, so it births it) -------------
-local Miked = getgenv().Miked
-if not Miked then
-    Miked = {
-        _version = "0.2.0",
-        Config   = {},   -- filled by a later Config module
-        State    = {},   -- live swarm state (replaces the old _G soup)
-        Conns    = {},   -- tracked connections, for clean teardown
-        Cache    = {},   -- rosters / bot indexes
-    }
-    getgenv().Miked = Miked
-end
+-- Namespace root — core.lua (or loader.lua) normally sets this up first.
+-- Socket just ensures every field exists so it works no matter the load order
+-- (core-first, loader-first, or Socket standalone). Never clobbers.
+local Miked = getgenv().Miked or {}
+getgenv().Miked = Miked
+Miked._version = Miked._version or "0.2.0"
+Miked.Config   = Miked.Config   or {}   -- your settings (main/alts/wsUrl…)
+Miked.State    = Miked.State    or {}   -- live swarm state
+Miked.Conns    = Miked.Conns    or {}   -- tracked connections, for teardown
+Miked.Cache    = Miked.Cache    or {}   -- rosters / bot indexes
 
 
 -- Config with safe defaults (a real Config module can override) -----------
@@ -284,11 +280,4 @@ end
 task.delay(1, Socket.status)
 return Socket
 
---[[ HOW TO TEST
-  1. pip install websockets      (once)
-  2. python relay.py             (leave it running)
-  3. Run Socket.lua on TWO accounts. Each should print:  ► connected to ws://...
-  4. On one account console:     getgenv().Miked.Socket.ping()
-  5. The other replies; pinger prints:  ◄ pong from <name>
-  If the pong lands, the transport is proven and every later brick rides it.
-]]
+--pip install websockets

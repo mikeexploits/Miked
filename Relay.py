@@ -1,15 +1,6 @@
 #!/usr/bin/env python3
 """
 Miked relay — local WebSocket hub for the alt swarm.
-
-Every account (main + bots) connects to ws://127.0.0.1:8080. When one sends
-a message, the relay fans it out to every OTHER connected client. That's it —
-a dumb, fast hub. Targeting ("to": "bot3") and dedupe are handled client-side
-in Miked.Socket, so this stays simple.
-
-Run it BEFORE executing Socket.lua on your accounts:
-    pip install websockets
-    python relay.py
 """
 
 import asyncio

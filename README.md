@@ -1,6 +1,7 @@
 # Miked
 ## I got tired of using year old alt controls that were buggy and basic, so i made my own\
-> [!WARNING] must install relay
+> [!WARNING]  
+> Critical content demanding immediate user attention due to potential risks.
 
 \
 LOADER

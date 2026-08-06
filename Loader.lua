@@ -3,6 +3,7 @@ miked alt control
 
 edit config below
 made by mike, vibe coded asf
+press ' to quick type on the command bar
 ]]
 
 

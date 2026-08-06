@@ -6,7 +6,7 @@ made by mike, vibe coded asf
 press ' to quick type on the command bar
 ]]
 
-
+--[[
 getgenv().Miked = {
     Config = {
         mainAccount = "MainGuy345",
@@ -26,6 +26,7 @@ getgenv().Miked = {
     },
     State = {}, Conns = {}, Cache = {},
 }
+]]
 
 if not game:IsLoaded() then game.Loaded:Wait() end
 repeat task.wait() until game:GetService("Players").LocalPlayer

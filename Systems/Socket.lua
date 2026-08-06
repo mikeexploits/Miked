@@ -1,9 +1,18 @@
 --[[
+    warning: vibe coded
+
+
     Miked.Socket — client-to-client transport (foundation brick #1)
     ----------------------------------------------------------------
     Transport: WebSocket to a local relay (relay.py) that fans messages
     out to every other connected client. All accounts run on one machine,
     so they all dial ws://127.0.0.1:PORT. Nothing Roblox can delete.
+
+    On top of the raw socket this layers a real protocol:
+      · JSON envelopes:  { id, t, to, from, fromId, ack, d }
+      · dedupe · self-echo filtering · targeted delivery · optional acks
+      · auto-reconnect with backoff · outbound buffer flushed on connect
+      · re-exec safe, all state under getgenv().Miked
 
     Public API
       Miked.Socket.send(type, data, opts)   opts = {to=, ack=, onAck=, timeout=}

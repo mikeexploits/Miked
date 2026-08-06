@@ -1,8 +1,12 @@
 # Miked
-## I got tired of using year old alt controls that were buggy and basic, so i made my own\
-> [!WARNING]  
-> YOU MUST INSTALL THE RELAY FOR THIS SCRIPT TO WORK!
-### LOADER
+
+I got tired of using year-old alt controls that were buggy and basic, so I made my own.
+
+> [!WARNING]
+> **YOU MUST INSTALL THE RELAY FOR THIS SCRIPT TO WORK!**
+
+## Loader
+
 ```lua
 getgenv().Miked = {
     Config = {
@@ -29,6 +33,10 @@ repeat task.wait() until game:GetService("Players").LocalPlayer
 
 local BASE = "https://raw.githubusercontent.com/mikeexploits/Miked/refs/heads/main/Systems/"
 local function use(f) return loadstring(game:HttpGet(BASE .. f))() end
+
+use("Socket.lua")
+use("Core.lua")
 ```
-\
-WARNING: vibe coded
+
+> [!NOTE]
+> this is really vibe coded

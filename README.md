@@ -1,6 +1,6 @@
 # Miked
 ## I got tired of using year old alt controls that were buggy and basic, so i made my own\
-> [!] You MUST download the relay for this to work. 
+> [!WARNING] You MUST download the relay for this to work.\
 \
 LOADER
 ```lua

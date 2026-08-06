@@ -1,7 +1,8 @@
 # Miked
 ## I got tired of using year old alt controls that were buggy and basic, so i made my own\
 > [!WARNING]  
-> Critical content demanding immediate user attention due to potential risks.
+> YOU MUST INSTALL THE RELAY FOR THIS SCRIPT TO WORK!
+\
 ### LOADER
 ```lua
 getgenv().Miked = {
